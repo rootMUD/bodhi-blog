@@ -1,9 +1,9 @@
 const contracts = {
   // modifile here.
-  84531: [
+  10: [
     {
-      chainId: "84531",
-      name: "baseGoerli",
+      chainId: "10",
+      name: "optimism",
       contracts: {
         VectorDBProposalGovernancer: {
           address: "0x604dcaEC4E9ad55737F00D87B47ae497d2d78608",

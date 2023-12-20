@@ -45,7 +45,7 @@ const ETHSpace: NextPage = () => {
     //   })
     // });
     // const data=await response.json();
-    setOptions(["base-chain"]);
+    setOptions(["bodhi-contents"]);
   };
   //获取search prompt与dataset名字后向后端发request
   const handleonClick = async () => {
@@ -112,21 +112,8 @@ const ETHSpace: NextPage = () => {
       <div className="hero min-h-screen bg-base-200 bg-gradient-to-r from-green-500 to-blue-500">
         <div className="hero-content text-center">
           <div className="max-w-md">
-            <h1 className="text-2xl font-bold">AI-based Smart Contract Explorer</h1>
-            <p className="py-6">-- Project Search & Tagger Platform based on AI </p>
-            <div className="form-control mb-6">
-              <label className="label cursor-pointer">
-                <span className="label-text text-2xl">Search in the Free Dataset:</span>
-                <input
-                  type="checkbox"
-                  className="toggle toggle-accent"
-                  checked={qinPublic}
-                  onChange={() => {
-                    setQinPublic(!qinPublic);
-                  }}
-                />
-              </label>
-            </div>
+            <h1 className="text-2xl font-bold">Bodhi AI Explorer</h1>
+            <p className="py-6">-- Content Search & Tagger App based on AI </p>
             <div className="join mb-6">
               <div>
                 <div>
@@ -150,7 +137,6 @@ const ETHSpace: NextPage = () => {
                         setDataset(e.target.value);
                       }}
                     >
-                      <option value="mixed">mixed</option>
                       {options.map((option, index) => (
                         <option key={index} value={option}>
                           {option}
@@ -185,8 +171,8 @@ const ETHSpace: NextPage = () => {
                 <p>
                   <b>Some search question examples: </b>
                 </p>
-                <p>* friend.tech</p>
-                <p>* social</p>
+                <p>* bitcoin</p>
+                <p>* bodhi</p>
               </span>
             </div>
           </div>
@@ -207,19 +193,30 @@ const ETHSpace: NextPage = () => {
                     <div key={index}>
                       <div className="divider"></div>
                       <span className="text-xl">Data</span>
-                      <pre className="text-base mb-3">
+                      <div>
                         <ReactMarkdown>{item.data}</ReactMarkdown>
-                      </pre>
+                      </div>
                       <span className="text-xl">Metadata</span>
-                      <pre className="text-base">{JSON.stringify(item.metadata, null, 2)}</pre>
-                      <span className="text-xl">id</span>
+                      <pre className="text-base"><b>Creator:</b> {item.metadata.creator}</pre>
+                      <pre className="text-base"><b>Bodhi ID(view the full content in Bodhi): </b> 
+                      <a href={"https://bodhi.wtf/" + item.metadata.id} target="_blank" rel="noreferrer">
+                        <button
+                          className="btn join-item"
+                        >
+                          {item.metadata.id}
+                        </button>
+                      </a>
+                      </pre>
+                      <pre className="text-base"><b>Type: </b>{item.metadata.type}</pre>
+                      <br></br>
+                      <span className="text-xl">id in vectorDB</span>
                       <pre className="text-base">
                         <b>{item.id}</b>
                       </pre>
+                      <br></br>
                       <a href={"/debug?uuid=" + item.id} target="_blank" rel="noreferrer">
-                        <button className="btn join-item">Tag this Proj!</button>
+                        <button className="btn join-item">Tag this item!</button>
                       </a>
-                      <button className="btn join-item">Tag the TXs for this project! //TODO</button>
                     </div>
                   ))}
                 </div>
