@@ -35,6 +35,8 @@ Deno.serve(async (req) => {
         },
         // TODO: fetch pwd from env
         body: JSON.stringify({"params": [Deno.env.get('MOVESPACE_API_KEY'), "bodhi-text-contents", raw_data, metadata]}),
+        // body: JSON.stringify({"params": ["qwerty", "bodhi-text-contents", raw_data, metadata]}),
+
       })
       .then(response => 
         response.json()

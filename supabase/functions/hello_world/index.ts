@@ -25,13 +25,13 @@ Deno.serve(async (req) => {
   // })
 
 
-  await fetch('https://webhook.site/b6badf85-a897-4342-ab5d-a3bb2efb565b?from=opps', {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    // body: JSON.stringify({"hello": "world"}),
-  })
+  // await fetch('https://webhook.site/b6badf85-a897-4342-ab5d-a3bb2efb565b?from=opps', {
+  //   method: 'get',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify({"hello": "world"}),
+  // })
 
 
   return new Response(
