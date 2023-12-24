@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
-import { type } from "os";
+// import { type } from "os";
 import ReactMarkdown from "react-markdown";
 
 //定义一个新的数据类型来记录后端返回的数据
@@ -12,8 +12,13 @@ export type resultByDataset = {
 export type search_result = {
   id: string;
   data: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   metadata: {};
 };
+
+function timeout(delay: number) {
+  return new Promise(res => setTimeout(res, delay));
+}
 
 const ETHSpace: NextPage = () => {
   //在对后端发起请求后，将response的内容保存在results中
@@ -30,25 +35,27 @@ const ETHSpace: NextPage = () => {
   //获取用户搜索的prompt
   const [searchPrompt, setSearchPrompt] = useState("");
   //仅在组件挂载时执行一次获取数据集列表
-  useEffect(() => {
-    fetchOptions();
-    // console.log(data);
-  });
 
-  //从后端获取数据集列表
-  const fetchOptions = async () => {
-    // const response = await fetch("https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=get_cluster", {
-    //   method: "POST",
-    //   headers:{
-    //     'Content-Type':'application/json;charset=utf-8',
-    //   },
-    //   body:JSON.stringify({
-    //     "params": ["ai-based-smart-contract-explorer"]
-    //   })
-    // });
-    // const data=await response.json();
+  useEffect(() => {
     setOptions(["bodhi-text-contents"]);
-  };
+  }, []);
+  //从后端获取数据集列表
+  // useEffect(() => {
+  //   fetchOptions();
+  //   // console.log(data);
+  // });
+  // const fetchOptions = async () => {
+  //   // const response = await fetch("https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=get_cluster", {
+  //   //   method: "POST",
+  //   //   headers:{
+  //   //     'Content-Type':'application/json;charset=utf-8',
+  //   //   },
+  //   //   body:JSON.stringify({
+  //   //     "params": ["ai-based-smart-contract-explorer"]
+  //   //   })
+  //   // });
+  //   // const data=await response.json();
+  // };
   //获取search prompt与dataset名字后向后端发request
   const handleonClick = async () => {
     //每次查询前要先把res重置为空
@@ -56,44 +63,92 @@ const ETHSpace: NextPage = () => {
     // 1. request a search item at deno.
     // 2. wait for 1.5 sec to query the result.
     // 3. return as a list.
-    await fetch("https://embedding-search.deno.dev/", {
+
+    // await fetch("https://polite-goose-87.deno.dev", {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-Type": "application/json; charset=utf-8",
+    //   },
+    //   // mode: "no-cors",
+    // })
+    // .then(response => {
+    //   console.log("respp:" + JSON.stringify(response));
+    // })
+    console.log("searchPrompt:" + searchPrompt);
+    await fetch("https://light-moth-93.deno.dev/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        text: "leeduckgogogo",
+        text: searchPrompt,
       }),
+      // mode: "no-cors",
     })
-      .then(response => response.json())
-      .then(data => {
-        // handle data
+      .then(response => {
+        console.log("resp1" + JSON.stringify(response));
+        return response.json();
+      })
+      .then(async data => {
+        // 1. setItemId
         setItemId(data.item_id);
-        console.log("item id: " + itemId);
+        console.log("item_id: " + itemId);
+        // 2. wait 2 sec
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        await timeout(2000).then(async _pro => {
+          // 3. query for data
+          await fetch("https://query-bodhi-user-search-pqxf6rwg5a0v.deno.dev", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: itemId,
+            }),
+            // mode: "no-cors",
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+              const res1: resultByDataset = {
+                dataset_id: "bodhi-text-contents",
+                results: data.resp.data.map((item: { uuid: any; data: any; metadata: any }) => {
+                  return {
+                    id: item.uuid,
+                    data: item.data,
+                    metadata: item.metadata,
+                  };
+                }),
+              };
+              console.log("res1" + res1);
+              // console.log(data.result.similarities);
+              setRes(res => [res1, ...res]);
+            });
+        });
       });
 
-    const response = await fetch("https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=search_data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      body: JSON.stringify({
-        params: [dataset, searchPrompt, 5],
-      }),
-    });
-    const data = await response.json();
-    const res1: resultByDataset = {
-      dataset_id: data.result.dataset_id,
-      results: data.result.similarities.map((s: { data: any; metadata: any }) => {
-        return {
-          data: s.data,
-          metadata: s.metadata,
-        };
-      }),
-    };
-    // console.log(data.result.similarities);
-    setRes(res => [res1, ...res]);
-    // console.log(res);
+    // const response = await fetch("https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=search_data", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json; charset=utf-8",
+    //   },
+    //   body: JSON.stringify({
+    //     params: [dataset, searchPrompt, 5],
+    //   }),
+    // });
+    // const data = await response.json();
+    // const res1: resultByDataset = {
+    //   dataset_id: data.result.dataset_id,
+    //   results: data.result.similarities.map((s: { data: any; metadata: any }) => {
+    //     return {
+    //       data: s.data,
+    //       metadata: s.metadata,
+    //     };
+    //   }),
+    // };
+    // // console.log(data.result.similarities);
+    // setRes(res => [res1, ...res]);
+    // // console.log(res);
   };
   return (
     <div className="grid lg:grid-cols-2 flex-grow">
@@ -180,9 +235,9 @@ const ETHSpace: NextPage = () => {
             </a>
             <br></br>
             <a href="https://explorer.movespace.xyz" target="_blank" rel="noreferrer">
-            <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
-              <b>🛝 Go to MoveSpace Explorer</b>
-            </button>
+              <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
+                <b>🛝 Go to MoveSpace Explorer</b>
+              </button>
             </a>
             <br></br>
             <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
@@ -216,17 +271,19 @@ const ETHSpace: NextPage = () => {
                         <ReactMarkdown>{item.data}</ReactMarkdown>
                       </div>
                       <span className="text-xl">Metadata</span>
-                      <pre className="text-base"><b>Creator:</b> {item.metadata.creator}</pre>
-                      <pre className="text-base"><b>Bodhi ID(view the full content in Bodhi): </b> 
-                      <a href={"https://bodhi.wtf/" + item.metadata.id} target="_blank" rel="noreferrer">
-                        <button
-                          className="btn join-item"
-                        >
-                          {item.metadata.id}
-                        </button>
-                      </a>
+                      <pre className="text-base">
+                        <b>Creator:</b> {item.metadata.creator}
                       </pre>
-                      <pre className="text-base"><b>Type: </b>{item.metadata.type}</pre>
+                      <pre className="text-base">
+                        <b>Bodhi ID(view the full content in Bodhi👉): </b>
+                        <a href={"https://bodhi.wtf/" + item.metadata.id} target="_blank" rel="noreferrer">
+                          <button className="btn join-item">{item.metadata.id}</button>
+                        </a>
+                      </pre>
+                      <pre className="text-base">
+                        <b>Type: </b>
+                        {item.metadata.type}
+                      </pre>
                       <br></br>
                       <span className="text-xl">id in vectorDB</span>
                       <pre className="text-base">
@@ -234,7 +291,7 @@ const ETHSpace: NextPage = () => {
                       </pre>
                       <br></br>
                       <a href={"/debug?uuid=" + item.id} target="_blank" rel="noreferrer">
-                        <button className="btn join-item">Tag this item!</button>
+                        <button className="btn join-item">Tag this item!(Comming Soon..)</button>
                       </a>
                     </div>
                   ))}
