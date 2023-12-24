@@ -37,6 +37,16 @@ export const Footer = () => {
                 ✰ Star me
               </a>
             </div>
+            <div className="text-center">
+              <a
+                href="https://github.com/NonceGeek/bodhi-searcher/issues"
+                target="_blank"
+                rel="noreferrer"
+                className="link"
+              >
+                🤔 Any Suggestions
+              </a>
+            </div>
             <span>·</span>
             <div className="flex justify-center items-center gap-2">
               <p className="m-0 text-center">

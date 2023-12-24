@@ -58,10 +58,8 @@ const ETHSpace: NextPage = () => {
   // };
   //获取search prompt与dataset名字后向后端发request
   const handleonClick = async () => {
-    //每次查询前要先把res重置为空
-    setRes([]);
     // 1. request a search item at deno.
-    // 2. wait for 1.5 sec to query the result.
+    // 2. wait for 1 sec to query the result.
     // 3. return as a list.
 
     // await fetch("https://polite-goose-87.deno.dev", {
@@ -74,8 +72,9 @@ const ETHSpace: NextPage = () => {
     // .then(response => {
     //   console.log("respp:" + JSON.stringify(response));
     // })
+
     console.log("searchPrompt:" + searchPrompt);
-    await fetch("https://light-moth-93.deno.dev/", {
+    const response = await fetch("https://embedding-search.deno.dev/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,48 +83,44 @@ const ETHSpace: NextPage = () => {
         text: searchPrompt,
       }),
       // mode: "no-cors",
-    })
-      .then(response => {
-        console.log("resp1" + JSON.stringify(response));
-        return response.json();
-      })
-      .then(async data => {
-        // 1. setItemId
-        setItemId(data.item_id);
-        console.log("item_id: " + itemId);
-        // 2. wait 2 sec
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        await timeout(2000).then(async _pro => {
-          // 3. query for data
-          await fetch("https://query-bodhi-user-search-pqxf6rwg5a0v.deno.dev", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: itemId,
-            }),
-            // mode: "no-cors",
-          })
-            .then(response => response.json())
-            .then(data => {
-              console.log(data);
-              const res1: resultByDataset = {
-                dataset_id: "bodhi-text-contents",
-                results: data.resp.data.map((item: { uuid: any; data: any; metadata: any }) => {
-                  return {
-                    id: item.uuid,
-                    data: item.data,
-                    metadata: item.metadata,
-                  };
-                }),
-              };
-              console.log("res1" + res1);
-              // console.log(data.result.similarities);
-              setRes(res => [res1, ...res]);
-            });
-        });
-      });
+    });
+    const data = await response.json();
+    console.log("data:", data);
+
+    // 1. setItemId
+    setItemId(data.item_id);
+    console.log("item_id: " + data.item_id);
+
+    // 2. wait 1 sec
+    await timeout(1000);
+
+    // 3. query for data
+    const response2 = await fetch("https://query-bodhi-user-search.deno.dev", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: data.item_id,
+      }),
+      // mode: "no-cors",
+    });
+    const data2 = await response2.json();
+    console.log("data2: ", data2);
+
+    const res1: resultByDataset = {
+      dataset_id: "bodhi-text-contents",
+      results: data2.resp.data.map((item: { uuid: any; data: any; metadata: any }) => {
+        return {
+          id: item.uuid,
+          data: item.data,
+          metadata: item.metadata,
+        };
+      }),
+    };
+    console.log("res1: ", res1);
+    // console.log(data.result.similarities);
+    setRes([res1]);
 
     // const response = await fetch("https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=search_data", {
     //   method: "POST",
@@ -216,6 +211,7 @@ const ETHSpace: NextPage = () => {
                 </p>
                 <p>* bitcoin</p>
                 <p>* bodhi</p>
+                <p>* leeduckgo</p>
               </span>
             </div>
             <a href="https://bodhi.wtf/10586" target="_blank" rel="noreferrer">
@@ -224,11 +220,7 @@ const ETHSpace: NextPage = () => {
               </button>
             </a>
             <br></br>
-            <a
-              href="https://bodhi.wtf/address/0x73c7448760517E3E6e416b2c130E3c6dB2026A1d"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://bodhi.wtf/13663" target="_blank" rel="noreferrer">
               <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
                 📝 Blog for Explorer<b>(See the future plan)</b>
               </button>
@@ -240,9 +232,11 @@ const ETHSpace: NextPage = () => {
               </button>
             </a>
             <br></br>
+            <a href="https://random-hacker.deno.dev/" target="_blank" rel="noreferrer">
             <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
               👽 A Random <b>Indie Hacker</b>
             </button>
+            </a>
             <br></br>
             <a href="https://twitter.com/0xleeduckgo" target="_blank" rel="noreferrer">
               <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
@@ -257,7 +251,7 @@ const ETHSpace: NextPage = () => {
           <h2 className="text-4xl font-bold mb-1">Search Results</h2>
           <div>
             {res.map((r, index) => (
-              <div key={index} className="collapse bg-base-200 m-5 overflow-x-auto">
+              <div key={index} className="collapse collapse-open bg-base-200 m-5 overflow-x-auto">
                 <input type="checkbox" className="peer" />
                 <div className="collapse-title bg-primary text-primary-content peer-checked:bg-secondary peer-checked:text-secondary-content">
                   Results from {r.dataset_id}
