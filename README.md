@@ -64,5 +64,5 @@ Run smart contract test with `yarn hardhat:test`
 
 ## Architecture
 
-![AI-based Smart Contract Explorer (3)](https://github.com/NonceGeek/ai-based-smart-contract-explorer/assets/12784118/505467a6-03ed-4730-abb8-5869d7bb5228)
+`TODO`
 
