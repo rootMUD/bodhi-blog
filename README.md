@@ -3,36 +3,13 @@
 <h4 align="center">
   <a href="https://smart-contract-explorer.movespace.xyz/"> -[ Lanuch App ]- </a>
 </h4>
-<h4>
-  Other important links:
-  <br><br>
-  * <a href="https://mumbai.polygonscan.com/address/0x9d4716dc798ceac7e40b0b692e7a2fc3a353c4b1">smart contract on Mumbai Network</a>
-  <br>
-  * <a href="https://app.embedbase.xyz/datasets/f2e0aabc-a506-4217-8570-4c888d3d3556">VectorDB about Ethereum Smart Contract</a>
-  <br>
-  * <a href="https://app.embedbase.xyz/datasets/7740d47b-8ce1-4ae7-8256-049b01fa034d">VectorDB about Ethereum Smart Contract Sliced</a>
-  <br>
-  * <a href="https://app.embedbase.xyz/datasets/e4276331-4582-463b-85be-abc8b21ad739">VectorDB about Ethereum Smart Contract Analysis</a>
-</h4>
 
-
-See Demo Video:
-
-> https://youtu.be/zeY9lp2Hcwo
-
-See Deck:
-
-> https://github.com/NonceGeek/ai-based-smart-contract-explorer/blob/main/AI-based-Smart-Contract-Explorer-Deck.pdf
-
-
-
-🧪 Bodhi AI Explorer 是一个 基于向量数据库和 LLM 进行 ETH 智能合约代码检索的浏览器，搜索结果包含智能合约原文、出处、代码解析等多维度内容。向量数据库技术是人工智能应用中的一项重要技术，通过 ANN 最似近邻算法，我们可以通过自然语言进行联想式搜索，而非传统的关键字搜索。立项起因是传统搜索代码的浏览器，例如 Etherscan，仅能搜索出原始代码。我们希望通过 AI 赋能，建立关于智能合约代码的全维度搜索，让合约开发者的效率指数倍增。
-
+🧪 Bodhi AI Explorer 是一个基于向量化数据和智能合约的 Bodhi 内容搜索和去中心化内容标注 App。
 
 
 ## Quickstart
 
-如果您想快速体验我们的功能请通过：<a href="https://smart-contract-explorer.movespace.xyz/">Lanuch App</a>
+如果您想快速体验我们的功能请通过：<a href="https://bodhi.movespace.xyz/">Lanuch App</a>
 
 ## Frontend
 ### Requirements
