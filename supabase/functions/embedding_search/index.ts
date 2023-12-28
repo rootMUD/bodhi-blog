@@ -29,42 +29,41 @@ Deno.serve(async (req) => {
   .select()
 
   const the_id = data[0].id;
-  console.log(the_id);
 
-  await fetch('https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=get_embedding', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-        body: JSON.stringify({"params": [Deno.env.get('MOVESPACE_API_KEY'), txt]}),
-      })
-      .then(response => 
-        response.json()
-      )
-      .then(async result => {
-        console.log("calling faas result:" + result);
-      const embedding = JSON.parse(result.result.data.vector);
-      // In production we should handle possible errors
-      // const { data: resp } = 
-      await supabase.rpc('match_full_dataset', {
-        query_embedding: embedding,
-        match_threshold: 0.78, // Choose an appropriate threshold for your data
-        match_count: 5, // Choose the number of matches
-      })
-      .then(async (resp: any) =>{
-        await supabase
-        .from('bodhi_user_search')
-        .update({
-          embedding: embedding,
-          resp: resp
-        })
-        .eq('id', the_id)
-        .then(result => {
-          console.log("update result: "+ JSON.stringify(result));
-        })
+  // await fetch('https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=get_embedding', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //       body: JSON.stringify({"params": [Deno.env.get('MOVESPACE_API_KEY'), txt]}),
+  //     })
+  //     .then(response => 
+  //       response.json()
+  //     )
+  //     .then(async result => {
+  //       console.log("calling faas result:" + result);
+  //     const embedding = JSON.parse(result.result.data.vector);
+  //     // In production we should handle possible errors
+  //     // const { data: resp } = 
+  //     await supabase.rpc('match_full_dataset', {
+  //       query_embedding: embedding,
+  //       match_threshold: 0.78, // Choose an appropriate threshold for your data
+  //       match_count: 5, // Choose the number of matches
+  //     })
+  //     .then(async (resp: any) =>{
+  //       await supabase
+  //       .from('bodhi_user_search')
+  //       .update({
+  //         embedding: embedding,
+  //         resp: resp
+  //       })
+  //       .eq('id', the_id)
+  //       .then(result => {
+  //         console.log("update result: "+ JSON.stringify(result));
+  //       })
 
-      })
-    })
+  //     })
+  //   })
 
   return new Response(
     JSON.stringify({"item_id": the_id}),

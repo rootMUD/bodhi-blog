@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NextPage } from "next";
 // import { type } from "os";
 import ReactMarkdown from "react-markdown";
@@ -36,27 +36,39 @@ const ETHSpace: NextPage = () => {
   const [searchPrompt, setSearchPrompt] = useState("");
   //仅在组件挂载时执行一次获取数据集列表
 
+  // Ref to attach to the audio element
+
+
   useEffect(() => {
     setOptions(["bodhi-text-contents"]);
   }, []);
-  //从后端获取数据集列表
-  // useEffect(() => {
-  //   fetchOptions();
-  //   // console.log(data);
-  // });
-  // const fetchOptions = async () => {
-  //   // const response = await fetch("https://faas.movespace.xyz/api/v1/run?name=VectorAPI&func_name=get_cluster", {
-  //   //   method: "POST",
-  //   //   headers:{
-  //   //     'Content-Type':'application/json;charset=utf-8',
-  //   //   },
-  //   //   body:JSON.stringify({
-  //   //     "params": ["ai-based-smart-contract-explorer"]
-  //   //   })
-  //   // });
-  //   // const data=await response.json();
-  // };
-  //获取search prompt与dataset名字后向后端发request
+
+    // new feature
+  const handleEnterPress = (event: { key: string }) => {
+      if (event.key === "Enter") {
+        console.log("Enter Enter Key! ");
+        handleonClick();
+      }
+      // TODO: maybe set an EGG here.
+    };
+
+  // Ref to attach to the audio element
+  const audioRef = useRef(null);
+
+  // State to manage playing state
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Function to toggle music play/pause
+  const togglePlayPause = () => {
+    const prevValue = isPlaying;
+    setIsPlaying(!prevValue);
+    if (!prevValue) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  };
+    
   const handleonClick = async () => {
     // 1. request a search item at deno.
     // 2. wait for 1 sec to query the result.
@@ -151,6 +163,7 @@ const ETHSpace: NextPage = () => {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-2xl font-bold">🔎🤠 Bodhi AI Explorer</h1>
+
             <p className="py-6">-- Content Search & Tagger App based on AI </p>
             <div className="join mb-6">
               <div>
@@ -162,6 +175,7 @@ const ETHSpace: NextPage = () => {
                     onChange={e => {
                       setSearchPrompt(e.target.value);
                     }}
+                    onKeyDown={handleEnterPress}
                     placeholder="Enter your prompt to search"
                   />
                 </div>
@@ -279,6 +293,16 @@ const ETHSpace: NextPage = () => {
                         {item.metadata.type}
                       </pre>
                       <br></br>
+                      {item.metadata.audio && (<div>
+                        <b>Play Music: </b>
+                        <audio src={item.metadata.audio}></audio>
+                        
+                        <audio ref={audioRef} src={item.metadata.audio} preload="metadata" />
+                        <button className="btn join-item" onClick={togglePlayPause}>{isPlaying ? "Pause" : "Play"}</button>
+                        <a href={item.metadata.audio} target="_blank" rel="noreferrer">
+                        <button className="btn join-item">Download</button>
+                        </a>
+                      </div>)}
                       <span className="text-xl">id in vectorDB</span>
                       <pre className="text-base">
                         <b>{item.id}</b>
