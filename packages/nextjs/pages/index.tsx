@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { NextPage } from "next";
 // import { type } from "os";
 import ReactMarkdown from "react-markdown";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { parseEther } from "viem";
 
 //定义一个新的数据类型来记录后端返回的数据
 export type resultByDataset = {
@@ -38,19 +40,24 @@ const ETHSpace: NextPage = () => {
 
   // Ref to attach to the audio element
 
-
   useEffect(() => {
     setOptions(["bodhi-text-contents"]);
   }, []);
 
-    // new feature
+  // const { data: totalCounter } = useScaffoldContractRead({
+  //   contractName: "vectorTagger",
+  //   functionName: "vectorName",
+  //   args: [],
+  // });
+
+  // new feature
   const handleEnterPress = (event: { key: string }) => {
-      if (event.key === "Enter") {
-        console.log("Enter Enter Key! ");
-        handleonClick();
-      }
-      // TODO: maybe set an EGG here.
-    };
+    if (event.key === "Enter") {
+      console.log("Enter Enter Key! ");
+      handleonClick();
+    }
+    // TODO: maybe set an EGG here.
+  };
 
   // Ref to attach to the audio element
   const audioRef = useRef(null);
@@ -58,6 +65,25 @@ const ETHSpace: NextPage = () => {
   // State to manage playing state
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const [assetId, setAssetId] = useState(0);
+  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+    contractName: "vectorTagger",
+    functionName: "tagItem",
+    args: [
+      assetId,
+      JSON.stringify({like: true})
+    ],
+    value: parseEther("0"),
+    blockConfirmations: 1,
+    onBlockConfirmation: txnReceipt => {
+      console.log("Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
+  const likeAsset = (assetId: SetStateAction<number>) =>{
+    setAssetId(assetId);
+    writeAsync();
+  };
   // Function to toggle music play/pause
   const togglePlayPause = () => {
     const prevValue = isPlaying;
@@ -68,7 +94,7 @@ const ETHSpace: NextPage = () => {
       audioRef.current.pause();
     }
   };
-    
+
   const handleonClick = async () => {
     // 1. request a search item at deno.
     // 2. wait for 1 sec to query the result.
@@ -247,9 +273,9 @@ const ETHSpace: NextPage = () => {
             </a>
             <br></br>
             <a href="https://random-hacker.deno.dev/" target="_blank" rel="noreferrer">
-            <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
-              👽 A Random <b>Indie Hacker</b>
-            </button>
+              <button className="w-96 bg-white hover:bg-gray-100 text-gray-800 py-2 px-5 border border-gray-400 rounded shadow">
+                👽 A Random <b>Indie Hacker</b>
+              </button>
             </a>
             <br></br>
             <a href="https://twitter.com/0xleeduckgo" target="_blank" rel="noreferrer">
@@ -293,24 +319,33 @@ const ETHSpace: NextPage = () => {
                         {item.metadata.type}
                       </pre>
                       <br></br>
-                      {item.metadata.audio && (<div>
-                        <b>Play Music: </b>
-                        <audio src={item.metadata.audio}></audio>
-                        
-                        <audio ref={audioRef} src={item.metadata.audio} preload="metadata" />
-                        <button className="btn join-item" onClick={togglePlayPause}>{isPlaying ? "Pause" : "Play"}</button>
-                        <a href={item.metadata.audio} target="_blank" rel="noreferrer">
-                        <button className="btn join-item">Download</button>
-                        </a>
-                      </div>)}
+                      {item.metadata.audio && (
+                        <div>
+                          <b>Play Music: </b>
+                          <audio src={item.metadata.audio}></audio>
+
+                          <audio ref={audioRef} src={item.metadata.audio} preload="metadata" />
+                          <button className="btn join-item" onClick={togglePlayPause}>
+                            {isPlaying ? "Pause" : "Play"}
+                          </button>
+                          <a href={item.metadata.audio} target="_blank" rel="noreferrer">
+                            <button className="btn join-item">Download</button>
+                          </a>
+                        </div>
+                      )}
                       <span className="text-xl">id in vectorDB</span>
                       <pre className="text-base">
                         <b>{item.id}</b>
                       </pre>
                       <br></br>
-                      <a href={"/debug?uuid=" + item.id} target="_blank" rel="noreferrer">
-                        <button className="btn join-item">Tag this item!(Comming Soon..)</button>
-                      </a>
+                      <button
+                        onClick={() => {
+                          likeAsset(item.metadata.id);
+                        }}
+                        className="btn join-item"
+                      >
+                        Like this asset 👍🏻!
+                      </button>
                     </div>
                   ))}
                 </div>
